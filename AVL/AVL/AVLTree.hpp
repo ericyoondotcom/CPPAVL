@@ -42,7 +42,8 @@ shared_ptr<AVLNode<T>> AVLTree<T>::RotateRight(shared_ptr<AVLNode<T>> node)
         parent->right = child;
     else
         head = child;
-    
+    child->Height++;
+    node->Height--;
     return child;
 }
 
@@ -65,7 +66,8 @@ shared_ptr<AVLNode<T>> AVLTree<T>::RotateLeft(shared_ptr<AVLNode<T>> node)
         parent->left = child;
     else
         head = child;
- 
+    child->Height++;
+    node->Height--;
     return child;
 }
 
