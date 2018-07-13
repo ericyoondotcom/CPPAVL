@@ -9,31 +9,36 @@ class AVLNode
 public:
     AVLNode(T newVal, int newHeight = 1, shared_ptr<AVLNode<T>> newParent = nullptr);
     T val;
-    int height;
+    int Height;
     int GetBalance();
     shared_ptr<AVLNode<T>> left = nullptr;
     shared_ptr<AVLNode<T>> right = nullptr;
     shared_ptr<AVLNode<T>> parent = nullptr;
+
 private:
 };
+
 
 template <class T>
 AVLNode<T>::AVLNode(T newVal, int newHeight, shared_ptr<AVLNode<T>> newParent){
     val = newVal;
-    height = newHeight;
     parent = newParent;
+    Height = 1;
 }
 
 template <class T>
 int AVLNode<T>::GetBalance(){
-    if(left == nullptr){
-        if(right == nullptr){
-            return 0;
-        }
-        return right->height;
+    
+    if(right == nullptr && left == nullptr)
+    {
+        return 0;
+    }
+    if(left == nullptr)
+    {
+        return right->Height;
     }
     if(right == nullptr){
-        return -left->height;
+        return -1 * left->Height;
     }
-    return right->height - left->height;
+    return right->Height - left->Height;
 }

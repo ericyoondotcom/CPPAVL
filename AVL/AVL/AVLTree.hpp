@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <memory>
 #include "AVLNode.hpp"
+#include <algorithm>
 
 using namespace std;
 template <class T>
@@ -13,12 +14,61 @@ class AVLTree
         void Delete(T value);
         shared_ptr<AVLNode<T>> head;
     private:
+    shared_ptr<AVLNode<T>> RotateRight(shared_ptr<AVLNode<T>> node);
+    shared_ptr<AVLNode<T>> RotateLeft(shared_ptr<AVLNode<T>> node);
 };
 
 template <class T>
 AVLTree<T>::AVLTree(){
     
 }
+
+template <class T>
+shared_ptr<AVLNode<T>> AVLTree<T>::RotateRight(shared_ptr<AVLNode<T>> node)
+{
+    auto parent = node->parent;
+    auto child = node->left;
+    auto last = child->right;
+    
+    child->parent = parent;
+    child->right = node;
+    node->parent = child;
+    node->left = last;
+    if(last != nullptr)
+        last->parent = node;
+    if(parent != nullptr && parent->left == node)
+        parent->left = child;
+    else if(parent != nullptr && parent->right == node)
+        parent->right = child;
+    else
+        head = child;
+    
+    return child;
+}
+
+template <class T>
+shared_ptr<AVLNode<T>> AVLTree<T>::RotateLeft(shared_ptr<AVLNode<T>> node)
+{
+    auto parent = node->parent;
+    auto child = node->right;
+    auto last = child->left;
+    
+    child->parent = parent;
+    child->left = node;
+    node->parent = child;
+    node->right = last;
+    if(last != nullptr)
+        last->parent = node;
+    if(parent != nullptr && parent->right == node)
+        parent->right = child;
+    else if(parent != nullptr && parent->left == node)
+        parent->left = child;
+    else
+        head = child;
+ 
+    return child;
+}
+
 
 template <class T>
 void AVLTree<T>::Insert(T newVal){
@@ -30,8 +80,10 @@ void AVLTree<T>::Insert(T newVal){
     while(true){
         
         if(newVal < currNode->val){
+            
             if(currNode->left == nullptr){
                 currNode->left = make_shared<AVLNode<T>>(AVLNode<T>(newVal, 1, currNode));
+                currNode->left->parent = currNode;
                 break;
             }
             currNode = currNode->left;
@@ -39,64 +91,34 @@ void AVLTree<T>::Insert(T newVal){
         }else{
             if(currNode->right == nullptr){
                 currNode->right = make_shared<AVLNode<T>>(AVLNode<T>(newVal, 1, currNode));
+                currNode->right->parent = currNode;
                 break;
             }
             currNode = currNode->right;
         }
     }
-    int iteration = 2;
+    
     while(currNode != nullptr){
-        if(currNode->height < iteration){
-            currNode->height = iteration;
-        }
+        
+        int leftHeight = (currNode->left == nullptr ? 0 : currNode->left->Height);
+        int rightHeight = (currNode->right == nullptr ? 0 : currNode->right->Height);
+        currNode->Height = max(leftHeight, rightHeight) + 1;
+        
         int bal = currNode->GetBalance();
+        
         if(bal > 1){
-            if(currNode->right->GetBalance() < 1){
-                currNode->parent->right = currNode->left;
-                currNode->left->parent = currNode->parent;
-                auto right = currNode->left->right;
-                currNode->left->right = currNode;
-                currNode->left = right;
-
-            }
-            currNode->parent->right = currNode->left;
-            currNode->left = currNode->parent;
-            if(currNode->parent == head){
-                head = currNode;
-            }else{
-                if(currNode->parent->parent->left == currNode){
-                    currNode->parent->parent->left = currNode;
-                }else{
-                    currNode->parent->parent->right = currNode;
-                }
-            }
-            currNode->parent = currNode->left->parent;
-            currNode->left->parent = currNode;
+            
+            if(currNode->right->GetBalance() < 0)
+                RotateRight(currNode->right);
+            
+            currNode = RotateLeft(currNode);
         }else if(bal < -1){
-            if(currNode->left->GetBalance() > 1){
-                currNode->parent->left = currNode->right;
-                currNode->right->parent = currNode->parent;
-                auto left = currNode->right->left;
-                currNode->right->left = currNode;
-                currNode->right = left;
-
-            }
-            currNode->parent->left = currNode->right;
-            currNode->right = currNode->parent;
-            if(currNode->parent == head){
-                head = currNode;
-            }else{
-                if(currNode->parent->parent->left == currNode){
-                    currNode->parent->parent->left = currNode;
-                }else{
-                    currNode->parent->parent->right = currNode;
-                }
-            }
-            currNode->parent = currNode->right->parent;
-            currNode->right->parent = currNode;
+            
+            if(currNode->left->GetBalance() > 0)
+                RotateLeft(currNode->left);
+            
+            currNode = RotateRight(currNode);
         }
         currNode = currNode->parent;
-        iteration++;
     }
-    
 }
