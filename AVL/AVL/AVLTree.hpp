@@ -27,7 +27,7 @@ template <class T>
 shared_ptr<AVLNode<T>> AVLTree<T>::RotateRight(shared_ptr<AVLNode<T>> node)
 {
     auto parent = node->parent;
-    auto child = node->left;
+    shared_ptr<AVLNode<T>> child = node->left;
     auto last = child->right;
     
     child->parent = parent;
@@ -36,10 +36,10 @@ shared_ptr<AVLNode<T>> AVLTree<T>::RotateRight(shared_ptr<AVLNode<T>> node)
     node->left = last;
     if(last != nullptr)
         last->parent = node;
-    if(parent != nullptr && parent->left == node)
-        parent->left = child;
-    else if(parent != nullptr && parent->right == node)
+    if(parent != nullptr && parent->right == node)
         parent->right = child;
+    else if(parent != nullptr && parent->left == node)
+        parent->left = child;
     else
         head = child;
     cout << "Prev node height: " << node->Height << endl;

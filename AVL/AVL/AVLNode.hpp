@@ -53,10 +53,10 @@ int AVLNode<T>::GetBalance(){
     }
     if(left == nullptr)
     {
-        return right->Height;
+        return right->GetHeightRecursive();
     }
     if(right == nullptr){
-        return -1 * left->Height;
+        return -1 * left->GetHeightRecursive();
     }
-    return right->Height - left->Height;
+    return right->GetHeightRecursive() - left->GetHeightRecursive();
 }
