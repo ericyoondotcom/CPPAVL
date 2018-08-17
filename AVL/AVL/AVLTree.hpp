@@ -91,7 +91,7 @@ void AVLTree<T>::Insert(T newVal){
                 break;
             }
             currNode = currNode->left;
-            break;
+            
         }else{
             if(currNode->right == nullptr){
                 currNode->right = make_shared<AVLNode<T>>(AVLNode<T>(newVal, 1, currNode));
@@ -109,7 +109,7 @@ void AVLTree<T>::Insert(T newVal){
         currNode->Height = max(leftHeight, rightHeight) + 1;
         
         int bal = currNode->GetBalance();
-        
+        cout << bal;
         if(bal > 1){
             
             if(currNode->right->GetBalance() < 0)

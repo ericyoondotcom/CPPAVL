@@ -6,6 +6,11 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
     AVLTree<int> tree;
+    
+    tree.Insert(3);
+    tree.Insert(2);
+    tree.Insert(1);
+    
     while(true){
         cout << "What should I do?\n(add / delete) > ";
         string op;
