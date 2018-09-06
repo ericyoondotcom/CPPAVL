@@ -11,11 +11,12 @@ class AVLTree
     public:
         AVLTree();
         void Insert(T newVal);
-        void Delete(T value);
+        void Remove(T val);
         shared_ptr<AVLNode<T>> head;
     private:
     shared_ptr<AVLNode<T>> RotateRight(shared_ptr<AVLNode<T>> node);
     shared_ptr<AVLNode<T>> RotateLeft(shared_ptr<AVLNode<T>> node);
+    
 };
 
 template <class T>
@@ -125,4 +126,124 @@ void AVLTree<T>::Insert(T newVal){
         }
         currNode = currNode->parent;
     }
+}
+
+template <class T>
+void AVLTree<T>::Remove(T val){
+    auto currNode = head;
+    while(true){
+        
+        if(val < currNode->val){
+            currNode = currNode->left;
+        } else if(val > currNode->val){
+            currNode = currNode->right;
+        }else{
+            break;
+        }
+    }
+    if(currNode->left == nullptr){
+        if(currNode->right == nullptr){
+            //He dies alone... :(
+            if(currNode == head){
+                head = nullptr;
+                return;
+            }
+            if(currNode->parent->left == currNode){
+                currNode->parent->left = nullptr;
+                currNode = currNode->parent;
+            }else if(currNode->parent->right == currNode){
+                currNode->parent->right = nullptr;
+                currNode = currNode->parent;
+            }else{
+                throw "Parent pointers messed up really badly or something.";
+            }
+            
+        }else{
+            //He dies with one right heir
+            if(currNode == head){
+                head = currNode->right;
+            }else{
+                if(currNode->parent->left == currNode){
+                    currNode->parent->left = currNode->right;
+                    currNode->right->parent = currNode->parent;
+                    
+                }else if(currNode->parent->right == currNode){
+                    currNode->parent->right = currNode->right;
+                    currNode->right->parent = currNode->parent;
+                }else{
+                    throw "Parent pointers messed up really badly or something.";
+                }
+                currNode = currNode->right;
+            }
+        }
+    }else if(currNode->right == nullptr){
+        //He dies with one left heir
+        if(currNode == head){
+            head = currNode->left;
+        }else{
+            if(currNode->parent->left == currNode){
+                currNode->parent->left = currNode->left;
+                currNode->left->parent = currNode->parent;
+            }else if(currNode->parent->right == currNode){
+                currNode->parent->right = currNode->left;
+                currNode->left->parent = currNode->parent;
+            }else{
+                throw "Parent pointers messed up really badly or something.";
+            }
+            currNode = currNode->left;
+        }
+    }else{
+        //He dies with two heirs who will battle for his will in a fight to the death!
+        auto searchNode = currNode;
+        searchNode = searchNode->left;
+        while(searchNode->right != nullptr){
+            searchNode = searchNode->right;
+        }
+        if(searchNode->left == nullptr){
+            currNode->val = searchNode->val;
+            if(searchNode->parent->left == searchNode){
+                searchNode->parent->left = nullptr;
+            }else if(searchNode->parent->right == searchNode){
+                searchNode->parent->right = nullptr;
+            }else{
+                throw "Parent pointers messed up really badly or something.";
+            }
+        }else{
+            if(searchNode->parent->left == searchNode){
+                searchNode->parent->left = searchNode->left;
+                searchNode->left->parent = searchNode->parent;
+            }else if(searchNode->parent->right == searchNode){
+                searchNode->parent->right = searchNode->left;
+                searchNode->left->parent = searchNode->parent;
+            }else{
+                throw "Parent pointers messed up really badly or something.";
+            }
+        }
+        currNode = searchNode;
+    }
+    
+    while(currNode != nullptr){
+        
+        int leftHeight = (currNode->left == nullptr ? 0 : currNode->left->Height);
+        int rightHeight = (currNode->right == nullptr ? 0 : currNode->right->Height);
+        currNode->Height = max(leftHeight, rightHeight) + 1;
+        
+        int bal = currNode->GetBalance();
+        cout << bal;
+        if(bal > 1){
+            
+            if(currNode->right->GetBalance() < 0)
+                RotateRight(currNode->right);
+            
+            currNode = RotateLeft(currNode);
+        }else if(bal < -1){
+            
+            if(currNode->left->GetBalance() > 0)
+                RotateLeft(currNode->left);
+            
+            currNode = RotateRight(currNode);
+        }
+        currNode = currNode->parent;
+    }
+    
 }

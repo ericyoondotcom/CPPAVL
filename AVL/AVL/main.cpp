@@ -8,9 +8,13 @@ int main(int argc, const char * argv[]) {
     AVLTree<int> tree;
     
     tree.Insert(3);
+    tree.Insert(5);
+    tree.Insert(6);
     tree.Insert(2);
-    tree.Insert(1);
+    tree.Insert(4);
+    tree.Insert(7);
     
+    tree.Remove(6);
     while(true){
         cout << "What should I do?\n(add / delete) > ";
         string op;
