@@ -27,6 +27,7 @@ int main(int argc, const char * argv[]) {
         }else if(op == "remove" || op == "delete" || op == "-" || op == "d" || op == "r"){
             int val;
             cin >> val;
+            tree.Remove(val);
         }else{
             cout << "I don't understand.\n";
         }
